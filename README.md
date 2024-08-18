@@ -1,6 +1,4 @@
-Certainly! Here's the complete content that you can place inside your `README.md` file:
 
-```markdown```markdown
 # **Payment Integration System**
 
 Welcome to the **Payment Integration System** project! This comprehensive system is designed to handle secure and efficient payment processing through **Razorpay**. The project is built using **Spring Boot** and is integrated with **Razorpay's API** to manage orders, capture payments, and handle webhooks for payment status updates. Additionally, the system includes email notifications and order management features.
