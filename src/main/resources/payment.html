@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SHK - Checkout</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        header {
+            background-color: #333;
+            color: #fff;
+            padding: 10px 0;
+            text-align: center;
+        }
+        .container {
+            width: 80%;
+            margin: 0 auto;
+        }
+        .checkout {
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            margin-top: 20px;
+        }
+        .checkout h2 {
+            margin-top: 0;
+        }
+        .checkout label {
+            display: block;
+            margin-top: 10px;
+        }
+        .checkout input {
+            width: calc(100% - 20px);
+            padding: 10px;
+            margin-top: 5px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .checkout button {
+            background-color: #28a745;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin-top: 20px;
+        }
+        .checkout button:hover {
+            background-color: #218838;
+        }
+    </style>
+</head>
+<body>
+<header>
+    <h1>Best Buy - Checkout</h1>
+</header>
+
+<div class="container">
+    <div class="checkout">
+        <h2>Shipping Details</h2>
+        <form id="shipping-form">
+            <label for="name">Name:</label>
+            <input type="text" id="name" required>
+
+            <label for="phoneNumber">PhoneNumber:</label>
+            <input type="text" id="phoneNumber" required>
+
+            <label for="email">Email:</label>
+            <input type="email" id="email" required>
+
+            <label for="shipping-address">Address:</label>
+            <input type="text" id="shipping-address" required>
+
+            <label for="shipping-city">City:</label>
+            <input type="text" id="shipping-city" required>
+
+            <label for="shipping-state">State:</label>
+            <input type="text" id="shipping-state" required>
+
+            <label for="shipping-postal">Postal Code:</label>
+            <input type="text" id="shipping-postal" required>
+
+            <label for="shipping-country">Country:</label>
+            <input type="text" id="shipping-country" required>
+
+            <button type="button" id="confirm-order-button">Confirm Order</button>
+        </form>
+    </div>
+</div>
+
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+<script>
+    let cart = JSON.parse(localStorage.getItem('cart')) || [];
+    console.log(cart)
+    const totalAmount = parseFloat(localStorage.getItem('cartTotal'));
+    document.getElementById('confirm-order-button').onclick = async function() {
+        const shippingForm = document.getElementById('shipping-form');
+        console.log(shippingForm.checkValidity())
+        console.log(shippingForm);
+
+
+        const orderDetails = {
+            name: document.getElementById('name').value,
+            emailId: document.getElementById('email').value,
+            phoneNumber: document.getElementById('phoneNumber').value,
+            orderItems: cart,
+            totalAmount: totalAmount,
+            shippingAddress: {
+                name: document.getElementById('name').value,
+                email: document.getElementById('email').value,
+                address: document.getElementById('shipping-address').value,
+                city: document.getElementById('shipping-city').value,
+                state: document.getElementById('shipping-state').value,
+                postal: document.getElementById('shipping-postal').value,
+                country: document.getElementById('shipping-country').value
+            },
+            orderTrackingUrl: 'https://yourdomain.com/track/ORD123456'
+        };
+
+        try {
+            // Save the order details
+            const saveOrderResponse = await fetch('http://localhost:8821/purchase/order/create', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(orderDetails)
+            });
+
+            if (!saveOrderResponse.ok) {
+                throw new Error('Failed to save order');
+            }
+
+            const order = await saveOrderResponse.json();
+            const amount = orderDetails.totalAmount * 100;
+
+            // Initiate payment
+            const paymentResponse = await fetch('http://localhost:8821/api/payments/make-payment', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    amount: amount,
+                    currency: 'INR'
+                })
+            });
+
+            if (!paymentResponse.ok) {
+                throw new Error('Failed to create payment order');
+            }
+
+            const paymentOrder = await paymentResponse.json();
+
+            var options = {
+                "key": "rzp_test_RsMYSoWn4FULQ9",
+                "amount": amount,
+                "currency": "INR",
+                "name": "SHK Limited",
+                "description": "Test Transaction",
+                "image": "https://upload.wikimedia.org/wikipedia/commons/8/89/Razorpay_logo.svg",
+                "order_id": paymentOrder.id,
+                "handler": async function (response) {
+                    alert('Payment successful we are navigating to Home Page');
+                    await fetch('http://localhost:8821/purchase/send-confirmation-mail', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(orderDetails)
+                    });
+                    window.location.href = 'confirmation.html';
+
+                },
+                "prefill": {
+                    "name":document.getElementById('name').value ,
+                    "email": document.getElementById('email').value,
+                    "contact": document.getElementById('phoneNumber').value
+                },
+                "theme": {
+                    "color": "#3399cc"
+                }
+            };
+            var rzp1 = new Razorpay(options);
+            rzp1.open();
+
+        } catch (error) {
+            console.error('Error during checkout:', error);
+            console.error('Error during checkout:', error.getError());
+            alert('Order submission failed. Please try again.');
+        }
+    };
+</script>
+</body>
+</html>
