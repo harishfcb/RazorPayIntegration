@@ -128,7 +128,7 @@
 
         try {
             // Save the order details
-            const saveOrderResponse = await fetch('http://localhost:8821/purchase/order/create', {
+            const saveOrderResponse = await fetch('https://razorpayintegration-2.onrender.com/purchase/order/create', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -144,7 +144,7 @@
             const amount = orderDetails.totalAmount * 100;
 
             // Initiate payment
-            const paymentResponse = await fetch('http://localhost:8821/api/payments/make-payment', {
+            const paymentResponse = await fetch('https://razorpayintegration-2.onrender.com/api/payments/make-payment', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -171,7 +171,7 @@
                 "order_id": paymentOrder.id,
                 "handler": async function (response) {
                     alert('Payment successful we are navigating to Home Page');
-                    await fetch('http://localhost:8821/purchase/send-confirmation-mail', {
+                    await fetch('https://razorpayintegration-2.onrender.com/purchase/send-confirmation-mail', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json'
