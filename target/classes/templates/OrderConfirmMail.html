@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Confirmation</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f9f9f9;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            width: 90%;
+            max-width: 700px;
+            margin: auto;
+            background: #ffffff;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+            margin-top: 30px;
+        }
+        header {
+            text-align: center;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #ff008c;
+            margin-bottom: 20px;
+        }
+        header img {
+            max-width: 150px;
+            margin-bottom: 10px;
+        }
+        header h1 {
+            color: #007bff;
+            font-size: 24px;
+            margin: 0;
+        }
+        .order-details {
+            margin-top: 20px;
+        }
+        .order-details h2 {
+            color: #007bff;
+            font-size: 20px;
+            margin-bottom: 15px;
+        }
+        .order-details table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .order-details table, .order-details th, .order-details td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+        .order-details th {
+            background-color: #23ab9a;
+            color: #ffffff;
+            font-weight: bold;
+        }
+        .order-details td img {
+            width: 60px;
+            height: auto;
+            border-radius: 5px;
+        }
+        .total-amount {
+            margin-top: 20px;
+            font-size: 22px;
+            font-weight: bold;
+            color: darkorange;
+            border-top: 2px solid #007bff;
+            padding-top: 10px;
+        }
+        .button {
+            display: inline-block;
+            background-color: bisque;
+            color: aliceblue;
+            padding: 12px 24px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: bold;
+            margin-top: 20px;
+            text-align: center;
+            transition: background-color 0.3s ease;
+        }
+        .button:hover {
+            background-color: cyan;
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 15px;
+            border-top: 2px solid #ddd;
+        }
+        footer p {
+            margin: 0;
+            color: black;
+        }
+        footer a {
+            color: red;
+            text-decoration: none;
+        }
+        footer a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <header>
+        <img src="https://as1.ftcdn.net/v2/jpg/07/72/34/18/1000_F_772341814_HhnTiGOJJtf4veU2S0E033E5iH4MrCXV.jpg" alt="Company Logo">
+        <h1>Thank You for Your Order!</h1>
+    </header>
+
+    <p>Dear <strong th:text="${customerName}">[Customer Name]</strong>,</p>
+
+    <p>We are thrilled to confirm your order. Here are the details:</p>
+
+    <div class="order-details">
+        <h2>Order Details</h2>
+        <table>
+            <thead>
+            <tr>
+                <th>Product</th>
+                <th>Quantity</th>
+                <th>Price</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="item : ${orderItems}">
+                <td><img th:src="@{${item.image}}" alt="Product Image"> <span th:text="${item.name}">Product Name</span></td>
+                <td th:text="${item.quantity}">Quantity</td>
+                <td th:text="${item.price}">Price</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <p class="total-amount">Total Amount: <span th:text="${totalAmount}">0 INR</span></p>
+
+    <p>Your order is being processed. You can track your order status using the button below:</p>
+
+    <a href="#" th:href="@{${orderTrackingUrl}}" class="button">Track Your Order</a>
+
+    <footer>
+        <p>If you have any questions, please contact us at <a href="mailto:support@example.com">support@example.com</a>.</p>
+        <p>Thank you for shopping with us!</p>
+    </footer>
+</div>
+</body>
+</html>
